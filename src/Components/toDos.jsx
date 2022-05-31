@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import AddContent from "./addContent";
+import RenderList from "./renderList";
 
 class Todos extends Component {
   state = {
@@ -14,39 +16,7 @@ class Todos extends Component {
     }
     this.setState({ lists });
   }
-  renderList = () => {
-    if (!this.state.lists.length) {
-      return <p>Click Add to create a new list</p>;
-    }
-    return (
-      <ul>
-        {this.state.lists.map((list, index) => (
-          <div key={index} className=" mb-3">
-            <li
-              onClick={() => this.handleCheck(index)}
-              htmlFor={index}
-              style={list.checked ? { textDecoration: "line-through" } : null}
-              className="ml-2"
-            >
-              {list.name}
-            </li>
-            <button
-              className="btn btn-secondary btn-sm col-2 mr-3"
-              onClick={() => this.handleEdit(index)}
-            >
-              Edit
-            </button>
-            <button
-              className="btn btn-danger btn-sm col-2 ml-1"
-              onClick={() => this.handleDelete(index)}
-            >
-              Delete
-            </button>
-          </div>
-        ))}
-      </ul>
-    );
-  };
+
   handleAdd = () => {
     const { value } = this.list.current;
     const lists = [...this.state.lists];
@@ -64,25 +34,25 @@ class Todos extends Component {
     this.list.current.value = "";
   };
 
-  handleDelete(index) {
+  handleDelete = (index) => {
     const lists = [...this.state.lists];
     lists.splice(index, 1);
     localStorage.setItem("lists", JSON.stringify(lists));
     this.setState({ lists });
-  }
+  };
 
-  handleEdit(index) {
+  handleEdit = (index) => {
     const lists = [...this.state.lists];
     this.list.current.value = lists[index].name;
     this.indexToBeAdded = index;
-  }
-  handleCheck(index) {
+  };
+  handleCheck = (index) => {
     const lists = [...this.state.lists];
     lists[index] = { ...lists[index] };
     lists[index].checked = !lists[index].checked;
     localStorage.setItem("lists", JSON.stringify(lists));
     this.setState({ lists });
-  }
+  };
   handleSort = () => {
     const lists = [...this.state.lists];
     lists.sort((a, b) => b.checked - a.checked);
@@ -91,16 +61,17 @@ class Todos extends Component {
   render() {
     return (
       <div>
-        <div>
-          <input type="text" ref={this.list} className="col-10" />
-          <button onClick={this.handleAdd} className="col-2 btn-primary">
-            Add
-          </button>
-          <button onClick={this.handleSort} className=" btn-primary">
-            Sort
-          </button>
-        </div>
-        {this.renderList()}
+        <AddContent
+          onAdd={this.handleAdd}
+          onSort={this.handleSort}
+          list={this.list}
+        />
+        <RenderList
+          stateLists={this.state.lists}
+          onCheck={this.handleCheck}
+          onEdit={this.handleEdit}
+          onDelete={this.handleDelete}
+        />
       </div>
     );
   }
